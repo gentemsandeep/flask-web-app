@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: my-eks-web-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: my-eks-web-app
+
+  template:
+    metadata:
+      labels:
+        app: my-eks-web-app
+
+    spec:
+      containers:
+        - name: my-eks-web-app
+          image: 767828728771.dkr.ecr.ap-south-1.amazonaws.com/my-eks-web-app:latest
+
+          ports:
+            - containerPort: 5000
+
+          envFrom:
+            - configMapRef:
+                name: my-eks-web-app-config
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
